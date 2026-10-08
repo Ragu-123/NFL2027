@@ -2,11 +2,15 @@
 __pycache__/
 *.py[cod]
 *$py.class
+*.egg-info/
+.pytest_cache/
 
 # Logs & temp files
 *.log
 .DS_Store
 
-# Root level loose images (all kept in knowledge/figures/)
+# Local figure outputs (official figures kept in knowledge/figures/)
+/figures/
 /*.png
 !/knowledge/figures/*.png
+

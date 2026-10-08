@@ -1,0 +1,67 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nfl2027"
+version = "0.1.0"
+description = "Neuro-Kinematic Trajectory Transformer & Continuous Differential Geometry for NFL Big Data Bowl 2027"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+    {name = "Ragu-123", email = "ragu@example.com"}
+]
+keywords = [
+    "NFL",
+    "Big Data Bowl 2027",
+    "kinematics",
+    "differential geometry",
+    "Frenet-Serret",
+    "Triton",
+    "deep learning",
+    "PyTorch",
+    "sports analytics"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+    "torch>=2.0.0",
+    "numpy>=1.23.0",
+    "pandas>=1.5.0",
+    "scipy>=1.9.0",
+    "scikit-learn>=1.2.0",
+    "matplotlib>=3.6.0",
+    "seaborn>=0.12.0",
+]
+
+[project.optional-dependencies]
+gpu = [
+    "triton>=3.0.0",
+]
+dev = [
+    "pytest>=7.0.0",
+]
+
+[project.scripts]
+nfl2027-train = "scripts.train:main"
+nfl2027-benchmark = "scripts.benchmark_kernel:main"
+nfl2027-figures = "scripts.generate_figures:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["nfl2027*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+pythonpath = ["."]
