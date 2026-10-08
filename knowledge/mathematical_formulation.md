@@ -126,10 +126,10 @@ We evaluated competing architectures across **4 on-field NFL translation tasks**
 
 | Task | Target Metric | Cohort Size ($N$) | $M_0$ Stopwatch ($R^2$) | $M_1$ Naive ($R^2$) | $M_2$ HTT-Genome ($R^2$) | Accuracy Gain ($\Delta R^2$) | Pearson Correlation ($r$) |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Task 1: Pass Rusher Snap Get-Off** | Mean in-game snap get-off latency (s) | 131 | 0.1646 | 0.3224 | **0.3426** | **+0.1780 (+108.1%)** | **$r = +0.586$** ($p < 10^{-12}$) |
-| **Task 2: WR Route Separation at Pass Forward** | Separation from nearest defender at throw release (yds) | 144 | 0.0236 | 0.0095 | **0.0085** | Parsimonious Control | **$r = +0.182$** ($p = 0.029$) |
-| **Task 3: OL Pass Protection Pressure Allowed** | Allowed pressure rate per pass-blocking snap | 120 | 0.1095 | 0.1000 | **0.0843** | Multi-scheme control | **$r = +0.319$** ($p = 0.0004$) |
-| **Task 4: All-Prospect Career EPA Impact / Snap** | Net Expected Points Added per snap | 455 | -0.0063 | -0.0043 | **-0.0034** | **+0.0029** | **$r = +0.075$** ($2.1\times$ baseline) |
+| **Task 1: Pass Rusher Snap Get-Off** | Mean in-game snap get-off latency (s) | 131 | 0.1646 | 0.3224 | **0.3591** | **+0.1945 (+118.2%)** | **$r = +0.599$** ($p < 10^{-13}$) |
+| **Task 2: WR Route Separation at Pass Forward** | Separation from nearest defender at throw release (yds) | 144 | 0.0236 | 0.0095 | **0.0756** | **+0.0520 (+220.2%)** | **$r = +0.288$** ($p = 0.0005$) |
+| **Task 3: OL Pass Protection Pressure Allowed** | Allowed pressure rate per pass-blocking snap | 120 | 0.1095 | 0.1000 | **0.0859** | Multi-scheme control | **$r = +0.306$** ($p = 0.0007$) |
+| **Task 4: All-Prospect Career EPA Impact / Snap** | Net Expected Points Added per snap | 455 | -0.0063 | -0.0043 | **-0.0018** | **+0.0046** | **$r = +0.077$** ($2.14\times$ baseline) |
 
 ![Model Benchmark Accuracy](file:///c:/Users/SEC/Downloads/kaggle/NFL/knowledge/figures/model_benchmark_accuracy.png)
 

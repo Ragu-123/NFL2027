@@ -674,7 +674,7 @@ X_t1_m1 = df_t1[naive_cols_t1].fillna(df_t1[naive_cols_t1].median()).values
 m1_t1 = GradientBoostingRegressor(n_estimators=40, max_depth=2, learning_rate=0.08, subsample=0.8, random_state=42)
 p_t1_m1, r2_t1_1, rmse_t1_1, mae_t1_1, r_t1_1, rho_t1_1, pval_t1_1 = evaluate_pipeline(X_t1_m1, y_t1, m1_t1, kf)
 
-m2_cols_t1 = ['ten_yd_split', 'forty_accel_05', 'forty_jerk_05', 'forty_power_05', 'fv_f0_rel', 'fv_tau', 'fv_amax', 'dl_peak_an', 'combine_weight', 'broad_jump', 'vertical', 'genome_pc_0', 'genome_pc_1']
+m2_cols_t1 = ['ten_yd_split', 'forty_accel_05', 'forty_jerk_05', 'forty_power_05', 'fv_f0_rel', 'fv_tau', 'fv_amax', 'dl_peak_an', 'combine_weight', 'broad_jump', 'vertical', 'genome_pc_0', 'genome_pc_1', 'genome_pc_2']
 X_t1_m2 = df_t1[m2_cols_t1].fillna(df_t1[m2_cols_t1].median()).values
 m2_t1 = GradientBoostingRegressor(n_estimators=45, max_depth=2, learning_rate=0.06, subsample=0.8, random_state=42)
 p_t1_m2, r2_t1_2, rmse_t1_2, mae_t1_2, r_t1_2, rho_t1_2, pval_t1_2 = evaluate_pipeline(X_t1_m2, y_t1, m2_t1, kf)
@@ -758,10 +758,12 @@ X_t3_m1 = df_t3[naive_cols_t3].fillna(df_t3[naive_cols_t3].median()).values
 m1_t3 = Pipeline([('scaler', StandardScaler()), ('reg', Ridge(alpha=20.0))])
 p_t3_m1, r2_t3_1, rmse_t3_1, mae_t3_1, r_t3_1, rho_t3_1, pval_t3_1 = evaluate_pipeline(X_t3_m1, y_t3, m1_t3, kf)
 
-m2_cols_t3 = ['combine_height', 'arm_length', 'wing_span', 'short_shuttle', 'three_cone', 'ol_burst_power', 'ol_peak_curv', 'fv_F0_total', 'genome_pc_0', 'genome_pc_1']
+m2_cols_t3 = trad_cols + ['ol_burst_power', 'ol_peak_curv', 'fv_F0_total', 'genome_pc_0', 'genome_pc_1']
 X_t3_m2 = df_t3[m2_cols_t3].fillna(df_t3[m2_cols_t3].median()).values
-m2_t3 = Pipeline([('scaler', StandardScaler()), ('reg', Ridge(alpha=18.0))])
+m2_t3 = Pipeline([('scaler', StandardScaler()), ('reg', Ridge(alpha=22.0))])
 p_t3_m2, r2_t3_2, rmse_t3_2, mae_t3_2, r_t3_2, rho_t3_2, pval_t3_2 = evaluate_pipeline(X_t3_m2, y_t3, m2_t3, kf)
+
+
 
 benchmark_results.append({
     'Task': 'OL Pass Protection Pressure Allowed',

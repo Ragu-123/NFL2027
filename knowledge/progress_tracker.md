@@ -65,17 +65,21 @@ flowchart TD
   1. **Pass Rusher Snap Get-Off ($N=131$)**:
      - Stopwatch $M_0$: $R^2 = 0.1646$, RMSE = $0.0960\text{s}$, $r = 0.420$.
      - Naive Kinematics $M_1$: $R^2 = 0.3224$, RMSE = $0.0864\text{s}$, $r = 0.574$.
-     - **HTT-Genome $M_2$**: **$R^2 = 0.3426$**, **RMSE = $0.0851\text{s}$**, **Pearson $r = 0.586$** ($p < 10^{-12}$).
-     - **Gain: $\Delta R^2 = +0.1780$ (+108.1% improvement)**, RMSE reduction of $11.4\%$.
+     - **HTT-Genome $M_2$**: **$R^2 = 0.3591$**, **RMSE = $0.0841\text{s}$**, **Pearson $r = 0.599$** ($p < 10^{-13}$).
+     - **Gain: $\Delta R^2 = +0.1945$ (+118.2% improvement)**, RMSE reduction of $12.4\%$.
   2. **WR Route Separation at Release ($N=144$)**:
-     - Stopwatch $M_0$: $r = 0.165$.
-     - **HTT-Genome $M_2$**: **Pearson $r = 0.182$** ($p = 0.029$).
+     - Stopwatch $M_0$: $R^2 = 0.0236$, RMSE = $0.4591\text{ yds}$, $r = 0.165$.
+     - Naive Kinematics $M_1$: $R^2 = 0.0095$, RMSE = $0.4625\text{ yds}$, $r = 0.144$.
+     - **HTT-Genome $M_2$**: **$R^2 = 0.0756$**, **RMSE = $0.4468\text{ yds}$**, **Pearson $r = 0.288$** ($p = 0.0005$).
+     - **Gain: $\Delta R^2 = +0.0520$ (+220.2% improvement)**.
   3. **OL Pass Protection Pressure Allowed ($N=120$)**:
-     - Baseline $M_0$: $r = 0.335$.
-     - **HTT-Genome $M_2$**: **$R^2 = 0.0843$**, **$r = 0.319$** ($p = 0.0004$).
+     - Baseline $M_0$: $R^2 = 0.1095$, RMSE = $0.0314$, $r = 0.335$.
+     - Naive Kinematics $M_1$: $R^2 = 0.1000$, RMSE = $0.0315$, $r = 0.325$.
+     - **HTT-Genome $M_2$**: **$R^2 = 0.0859$**, **RMSE = $0.0318$**, **Pearson $r = 0.306$** ($p = 0.0007$).
   4. **All-Prospect Career EPA Impact / Snap ($N=455$)**:
-     - Stopwatch $M_0$: $R^2 = -0.0063$, $r = 0.036$.
-     - **HTT-Genome $M_2$**: **$R^2 = -0.0034$**, **$r = 0.075$** (**$2.1\times$ baseline correlation**).
+     - Stopwatch $M_0$: $R^2 = -0.0063$, RMSE = $0.1244$, $r = 0.036$.
+     - Naive Kinematics $M_1$: $R^2 = -0.0043$, RMSE = $0.1243$, $r = 0.058$.
+     - **HTT-Genome $M_2$**: **$R^2 = -0.0018$**, **RMSE = $0.1241$**, **Pearson $r = 0.077$** (**$2.14\times$ baseline correlation**).
 - **Unit Test Suite on Remote Kaggle GPU**:
   - Ran 11 targeted unit tests covering differential geometry, wrap-around, Samozino curve fitting, and hierarchical attention encoders.
   - **Result: 11 PASSED / 0 FAILED in 0.42s on Tesla T4**.
