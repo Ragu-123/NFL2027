@@ -1,6 +1,9 @@
-"""Neuro-kinematic neural network architectures and regressors."""
+"""Model architectures for trajectory encoding and translation."""
 
 from nfl2027.models.encoder import (
+    IntraDrillTemporalAttentionEncoder,
+    MultiDrillCrossAttentionGenomeTransformer,
+    HierarchicalMovementGenomeNetwork,
     TrajectoryTemporalAttentionEncoder,
     TrajectoryRegressor,
 )
@@ -14,6 +17,9 @@ from nfl2027.models.regressors import (
 )
 
 __all__ = [
+    "IntraDrillTemporalAttentionEncoder",
+    "MultiDrillCrossAttentionGenomeTransformer",
+    "HierarchicalMovementGenomeNetwork",
     "TrajectoryTemporalAttentionEncoder",
     "TrajectoryRegressor",
     "build_baseline_model",

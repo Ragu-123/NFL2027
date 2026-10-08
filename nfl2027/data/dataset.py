@@ -15,37 +15,48 @@ class CombineDrillDataset(Dataset):
     def __init__(
         self,
         trajectories: Union[np.ndarray, torch.Tensor],
-        seq_lens: Union[np.ndarray, torch.Tensor],
-        targets: Optional[Union[np.ndarray, torch.Tensor]] = None,
+        seq_lens: Union[np.ndarray, torch.Tensor, List[int]],
+        targets: Optional[Union[np.ndarray, torch.Tensor, List[float]]] = None,
         meta_keys: Optional[List[Tuple]] = None,
         max_len: Optional[int] = None,
+        channels_first: Optional[bool] = None,
     ):
         """Initialize CombineDrillDataset.
 
         Args:
             trajectories: Array or tensor of shape (N, C, T) or (N, T, C)
-            seq_lens: Sequence lengths array or tensor of shape (N,)
+            seq_lens: Sequence lengths array, tensor, or list of shape (N,)
             targets: Optional regression target values (N,)
             meta_keys: Optional list of drill metadata tuples
             max_len: Optional slice cap on sequence length T
+            channels_first: Optional bool. If True, expects (N, C, T). If False, expects (N, T, C).
+                           If None, auto-detects based on channel dimensions.
         """
         if isinstance(trajectories, np.ndarray):
             trajectories = torch.from_numpy(trajectories).float()
         else:
             trajectories = trajectories.float()
 
-        # Ensure shape is (N, C, T)
-        if trajectories.ndim == 3 and trajectories.shape[1] > trajectories.shape[2]:
-            # Permute from (N, T, C) to (N, C, T)
-            trajectories = trajectories.permute(0, 2, 1)
+        # Handle channel layout: target internal representation is (N, C, T)
+        if trajectories.ndim == 3:
+            if channels_first is True:
+                pass
+            elif channels_first is False:
+                trajectories = trajectories.permute(0, 2, 1)
+            else:
+                # Auto-detect: if last dim matches standard channels (7) and middle does not, permute
+                if trajectories.shape[2] == 7 and trajectories.shape[1] != 7:
+                    trajectories = trajectories.permute(0, 2, 1)
 
         if max_len is not None and max_len < trajectories.shape[2]:
             trajectories = trajectories[:, :, :max_len]
 
-        if isinstance(seq_lens, np.ndarray):
+        if isinstance(seq_lens, torch.Tensor):
+            seq_lens = seq_lens.long()
+        elif isinstance(seq_lens, np.ndarray):
             seq_lens = torch.from_numpy(seq_lens).long()
         else:
-            seq_lens = seq_lens.long()
+            seq_lens = torch.tensor(seq_lens, dtype=torch.long)
 
         self.trajectories = trajectories
         self.seq_lens = seq_lens
@@ -55,10 +66,12 @@ class CombineDrillDataset(Dataset):
         self.seq_len = trajectories.shape[2]
 
         if targets is not None:
-            if isinstance(targets, np.ndarray):
+            if isinstance(targets, torch.Tensor):
+                targets = targets.float()
+            elif isinstance(targets, np.ndarray):
                 targets = torch.from_numpy(targets).float()
             else:
-                targets = targets.float()
+                targets = torch.tensor(targets, dtype=torch.float32)
             self.targets = targets
         else:
             self.targets = None

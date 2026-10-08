@@ -30,6 +30,9 @@ CANDIDATE_OUTPUT_DIRS = [
 ]
 
 
+import sys
+
+
 def detect_data_dir() -> Optional[str]:
     """Auto-detect the path containing the NFL Big Data Bowl 2027 dataset."""
     for path in CANDIDATE_DATA_DIRS:
@@ -42,13 +45,18 @@ def detect_data_dir() -> Optional[str]:
 
 def detect_output_dir() -> str:
     """Auto-detect or create a suitable directory for saving outputs."""
-    for path in CANDIDATE_OUTPUT_DIRS:
-        if path and os.path.isdir(path):
-            return path
-    # Fallback to local 'figures' directory
-    fallback = str(Path.cwd() / "figures")
-    os.makedirs(fallback, exist_ok=True)
-    return fallback
+    env_out = os.environ.get("NFL2027_OUTPUT_DIR")
+    if env_out and os.path.isdir(env_out):
+        return env_out
+
+    # Only use /kaggle/working if running inside a genuine Linux Kaggle environment
+    if sys.platform.startswith("linux") and os.path.isdir("/kaggle/working"):
+        return "/kaggle/working"
+
+    # Default to local figures directory inside project
+    local_dir = str(Path.cwd() / "figures")
+    os.makedirs(local_dir, exist_ok=True)
+    return local_dir
 
 
 # Traditional combine physical metrics reported by scouts
@@ -137,16 +145,16 @@ class Config:
     valuation_exp_lambda: float = 0.0094
     valuation_exp_c: float = 17.7
 
-    # Device
-    device: str = "cpu"
+    # Device: 'auto', 'cuda', 'cuda:0', 'cpu'
+    device: str = "auto"
 
     def __post_init__(self):
         import torch
 
-        if self.device == "cuda" and not torch.cuda.is_available():
+        if self.device == "auto":
+            self.device = "cuda:0" if torch.cuda.is_available() else "cpu"
+        elif self.device.startswith("cuda") and not torch.cuda.is_available():
             self.device = "cpu"
-        elif self.device == "cpu" and torch.cuda.is_available():
-            self.device = "cuda:0"
 
 
 def get_config(**kwargs) -> Config:

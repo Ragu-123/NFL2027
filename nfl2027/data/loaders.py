@@ -63,7 +63,8 @@ def load_raw_data(data_dir: Optional[str] = None) -> Dict[str, pd.DataFrame]:
 def merge_metadata(
     df_players: pd.DataFrame,
     df_combine_res: pd.DataFrame,
-    df_success: pd.DataFrame,
+    df_success: Optional[pd.DataFrame] = None,
+    how_success: str = "inner",
 ) -> pd.DataFrame:
     """Merge player demographics, combine measurements, and career success metrics.
 
@@ -72,7 +73,8 @@ def merge_metadata(
     Args:
         df_players: DataFrame from players.csv
         df_combine_res: DataFrame from combine_results.csv
-        df_success: DataFrame from player_career_successes.csv
+        df_success: Optional DataFrame from player_career_successes.csv
+        how_success: Join type for success table ('inner' or 'left')
 
     Returns:
         Merged master metadata DataFrame with anthropometric ratios and snap totals.
@@ -80,11 +82,13 @@ def merge_metadata(
     # Merge using composite key on draft_year to avoid column name collisions (_x, _y)
     df_meta = df_players.merge(
         df_combine_res, on=["nfl_id", "draft_year"], how="inner"
-    ).merge(df_success, on="nfl_id", how="inner")
+    )
+    if df_success is not None:
+        df_meta = df_meta.merge(df_success, on="nfl_id", how=how_success)
 
     # Total career snaps
-    off_snaps = df_meta.get("career_offensive_snaps", 0)
-    def_snaps = df_meta.get("career_defensive_snaps", 0)
+    off_snaps = df_meta.get("career_offensive_snaps", pd.Series(0, index=df_meta.index)).fillna(0)
+    def_snaps = df_meta.get("career_defensive_snaps", pd.Series(0, index=df_meta.index)).fillna(0)
     df_meta["total_career_snaps"] = off_snaps + def_snaps
 
     # Anthropometric indices
@@ -223,8 +227,9 @@ def prepare_play_targets(
         targets["dl_pressure_rate"] = df_pr
 
     # Task 3: WR Cushion Respect
-    if "cushion" in df_pp.columns and "combine_position" in master_df.columns:
-        wr_ids = master_df[master_df["combine_position"] == "WR"]["nfl_id"]
+    pos_col = "combine_position" if "combine_position" in master_df.columns else ("position" if "position" in master_df.columns else None)
+    if "cushion" in df_pp.columns and pos_col is not None:
+        wr_ids = master_df[master_df[pos_col] == "WR"]["nfl_id"]
         wr_pp_all = df_pp[df_pp["nfl_id"].isin(wr_ids)].copy()
         wr_cush = (
             wr_pp_all.groupby("nfl_id")
@@ -242,7 +247,7 @@ def prepare_play_targets(
 
 
 def generate_synthetic_dataset(
-    num_players: int = 60,
+    num_players: int = 90,
     drills_per_player: int = 4,
     random_seed: int = 42,
 ) -> Dict[str, pd.DataFrame]:
@@ -251,7 +256,7 @@ def generate_synthetic_dataset(
     Enables complete unit testing and local development without access to raw data.
 
     Args:
-        num_players: Number of synthetic prospects
+        num_players: Number of synthetic prospects (default: 90)
         drills_per_player: Number of drill attempts per player
         random_seed: Seed for reproducibility
 
@@ -263,7 +268,9 @@ def generate_synthetic_dataset(
 
     player_ids = np.arange(50000, 50000 + num_players)
     positions = ["WR", "CB", "DE", "DT", "T", "G", "TE", "OLB", "SS"]
-    assigned_pos = rng.choice(positions, size=num_players)
+    # Guarantee balanced cohort with ample WRs and pass rushers for all benchmark tasks
+    assigned_pos = np.array([positions[i % len(positions)] for i in range(num_players)])
+    rng.shuffle(assigned_pos)
     draft_years = rng.choice([2023, 2024, 2025], size=num_players)
     draft_picks = rng.randint(1, 256, size=num_players)
 
@@ -369,12 +376,12 @@ def generate_synthetic_dataset(
     # 5. Player play table (game plays)
     play_rows = []
     for pid, pos in zip(player_ids, assigned_pos):
-        num_plays = rng.randint(20, 60)
+        num_plays = rng.randint(30, 65)
         for p_idx in range(num_plays):
             get_off = float(rng.normal(0.72, 0.10)) if pos in ["DE", "DT", "OLB"] else np.nan
             cushion = float(rng.normal(6.5, 1.2)) if pos in ["WR", "CB"] else np.nan
             sack = 1 if (pos in ["DE", "DT"] and rng.rand() < 0.05) else 0
-            ttp = float(rng.normal(2.4, 0.4)) if (pos in ["DE", "DT"] and rng.rand() < 0.15) else np.nan
+            ttp = float(rng.normal(2.4, 0.4)) if (pos in ["DE", "DT"] and rng.rand() < 0.25) else np.nan
 
             play_rows.append(
                 {

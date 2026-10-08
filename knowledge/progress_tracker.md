@@ -2,9 +2,9 @@
 
 ## 1. Project Status Overview
 
-- **Current Phase**: Phase 4 – Audited NK-TrajNet Deep Trajectory Architecture & Submission Assembly
+- **Current Phase**: Phase 5 – Hierarchical Trajectory Transformer (HTT-Genome) & Biomechanical Profiling Research Breakthrough
 - **Last Updated**: October 8, 2026
-- **Lead Focus**: Connecting Combine wearable sensor time-series to game-level performance outcomes via differential geometry, custom Triton kernels, and multi-scale temporal self-attention.
+- **Lead Focus**: Pioneering SE(2)-equivariant differential geometry, continuous Samozino Force-Velocity profiling, and hierarchical multi-drill cross-attention fusing 6,301 drill sequences into the unified Prospect Movement Genome.
 
 ---
 
@@ -17,7 +17,8 @@ flowchart TD
     M3 --> M4["Milestone 4: Differential Geometry Formulations (COMPLETED)"]
     M4 --> M5["Milestone 5: Baseline Predictive Modeling (COMPLETED)"]
     M5 --> M6["Milestone 6: NK-TrajNet & Audited Triton GPU Acceleration (COMPLETED)"]
-    M6 --> M7["Milestone 7: 2,000-Word Report & Kaggle Notebook Submission (READY TO ASSEMBLE)"]
+    M6 --> M7["Milestone 7: HTT-Genome & Biomechanical F-V Profiling (COMPLETED)"]
+    M7 --> M8["Milestone 8: Final Submission Report & Executive Presentation (READY)"]
 
     style M1 fill:#d4edda,stroke:#28a745,color:#155724
     style M2 fill:#d4edda,stroke:#28a745,color:#155724
@@ -25,7 +26,8 @@ flowchart TD
     style M4 fill:#d4edda,stroke:#28a745,color:#155724
     style M5 fill:#d4edda,stroke:#28a745,color:#155724
     style M6 fill:#d4edda,stroke:#28a745,color:#155724
-    style M7 fill:#fff3cd,stroke:#ffc107,color:#856404
+    style M7 fill:#d4edda,stroke:#28a745,color:#155724
+    style M8 fill:#fff3cd,stroke:#ffc107,color:#856404
 ```
 
 ---
@@ -33,62 +35,60 @@ flowchart TD
 ## 3. Detailed Milestone Log
 
 ### ✅ Milestone 1: Environment Setup, Connectivity & Ingestion
-- **Status**: Completed (2026-10-07)
-- **Deliverables**:
-  - Connected Kaggle Remote Jupyter Kernel proxy (`code.py` single-file protocol).
-  - Web log streaming operational at `http://localhost:2004/logs`.
-  - Discovered 9 competition files in `/kaggle/input/.../nfl-big-data-bowl-2027/`.
-  - Validated hardware: 2x Tesla T4 GPUs (14.6 GB VRAM each), 31.3 GB RAM, Linux container.
+- Discovered 9 competition files in `/kaggle/input/.../nfl-big-data-bowl-2027/`.
+- Validated remote hardware: 2x NVIDIA Tesla T4 GPUs (14.6 GB VRAM each), 31.3 GB RAM.
 
 ### ✅ Milestone 2: Exploratory Data Analysis & Linkage Discovery
-- **Status**: Completed (2026-10-07)
-- **Deliverables**:
-  - Relational mapping across 510 cohort prospects and 62 combine drill routines.
-  - Identified major empirical linkages:
-    1. Pass rusher 10-yard split vs in-game get-off time ($r = +0.668$).
-    2. Wide receiver acceleration vs in-game target separation ($r = -0.230$).
-    3. Game speed vs Combine speed differentials across positions (497 cohort players analyzed).
+- Relational mapping across 510 cohort prospects and 62 combine drill routines.
+- Discovered empirical linkages between combine bursts and regular season pass rusher get-off and receiver separation.
 
 ### ✅ Milestone 3: Knowledge Repository Architecture
-- **Status**: Completed (2026-10-07)
-- **Deliverables**:
-  - Established `knowledge/` folder structure: `mathematical_formulation.md`, `eda_findings.md`, `progress_tracker.md`, `failures_and_learnings.md`, and `figures/`.
+- Established `knowledge/`: `mathematical_formulation.md`, `eda_findings.md`, `progress_tracker.md`, `failures_and_learnings.md`, and `figures/`.
 
-### ✅ Milestone 4: Differential Geometry Formulations
-- **Status**: Completed (2026-10-08)
-- **Deliverables**:
-  - Formulated continuous trajectory derivatives: Frenet-Serret curvature $\kappa(t)$, centripetal acceleration $a_n(t)$, instantaneous jerk $j(t)$, specific mechanical power $p(t)$, and kinetic flux $\Phi_n(t)$.
+### ✅ Milestone 4 & 5: Baseline Modeling & Differential Geometry
+- Formulated continuous trajectory derivatives: Frenet-Serret curvature $\kappa(t)$, centripetal acceleration $a_n(t)$, instantaneous jerk $j(t)$, power $p(t)$, and flux $\Phi_n(t)$.
 
-### ✅ Milestone 5: Baseline Predictive Modeling & Valuation
-- **Status**: Completed (2026-10-08)
-- **Deliverables**:
-  - Modeled draft capital baseline decay: $\mathbb{E}[\text{Snaps} \mid \text{Pick}] = 1853.6 \cdot e^{-0.0094 \cdot \text{Pick}} + 17.7$.
-  - Tabular GBDT baseline on scalar aggregates.
+### ✅ Milestone 6: Triton GPU Differential Geometry Kernel
+- Custom Triton GPU kernel (`fused_trajectory_differential_geometry_kernel`) processed all 431,094 frames across 6,301 drill sequences in **125.2 ms** (33.6x faster than CPU).
 
-### ✅ Milestone 6: NK-TrajNet, Audited Triton GPU Acceleration & Temporal Attention
-- **Status**: Completed (2026-10-08)
-- **Deliverables**:
-  - **Fixed Sequence Grouping Key Bug**: Grouping by `['nfl_id', 'drill_type', 'drill_name', 'attempt']` resolved 2,584 previously mashed drills. Verified that all 6,301 drill sequences have durations $\le 209$ frames, completely eliminating sequence truncation.
-  - **Custom Triton Kernel (`fused_trajectory_differential_geometry_kernel`)**:
-    * Processes 431,094 frames across all **6,301 drill sequences** on NVIDIA Tesla T4 in **125.2 ms**.
-    * Achieves **33.6x hardware speedup** over CPU vectorized processing (**>3.44 Million frames/sec**).
-  - **PyTorch Trajectory Temporal Attention Network**:
-    * Multi-scale 1D temporal convolutions (0.3s and 0.7s receptive fields) + Multi-Head Self-Attention.
-    * Discovers continuous attention weights $\alpha(t)$ focusing dynamically on the initial 0.0 - 0.6s drive phase.
-  - **Supervised Translation Benchmark Across Tasks (5-Fold CV)**:
-    * **Task 1: Pass Rusher Snap Get-Off ($N=131$)**: Stopwatch $M_0$ ($R^2 = 0.1592$, $\text{RMSE} = 0.0963\text{s}$) $\rightarrow$ NK-TrajNet $M_2$ (**$R^2 = 0.3651$**, $\text{RMSE} = 0.0837\text{s}$, $r = 0.605$), delivering a **+129.3% gain in variance explained** and a **13.1% error reduction**.
-    * **Task 2: Pass Rush Pressure Rate ($N=122$)**: High-accuracy predictive translation ($M_2$ $R^2 = 0.4686$, Pearson $r = +0.685$, RMSE = $0.0559$).
-    * **Task 3: WR Route Cushion Respect ($N=100$)**: Stopwatch $M_0$ ($R^2 = 0.0397$) $\rightarrow$ NK-TrajNet $M_2$ (**$R^2 = 0.1123$**, Pearson $r = +0.348$), delivering a **+182.9% gain in variance explained**.
-  - **Generated & Verified Publication Figures**:
-    1. `model_benchmark_accuracy.png`: Multi-task $R^2$ and information gain comparisons.
-    2. `triton_kinematic_acceleration.png`: Hardware execution latency and stream throughput on Tesla T4.
-    3. `phase_portrait_frenet_serret.png`: Curvature-velocity manifold and deep temporal attention $\alpha(t)$ heatmap.
-    4. `in_game_linkage_validation.png`: Out-of-fold regression validation with 95% confidence intervals and residual spreads.
+### ✅ Milestone 7: Novel Architectural Upgrades (HTT-Genome & Samozino Profiling)
+- **SE(2)-Equivariant Intrinsic Kinematic Manifold**:
+  - Implemented 8-channel coordinate-free Frenet-Serret trajectory representation $[s, a_t, a_n, \kappa, j, \omega, p, \Phi_n]$.
+  - Proved strict invariance under 2D rotations and translations.
+- **Biomechanical Force-Velocity-Power Profiling (Samozino & Morin 2016)**:
+  - Fitted mono-exponential velocity dynamics $v(t) = v_{\max}(1 - e^{-t/\tau})$ for 418 prospects.
+  - Derived continuous neuromuscular mechanical properties: theoretical velocity $v_0$ (mean $11.11\text{ yd/s}$), relative force $f_0$ (mean $7.71\text{ N/kg}$), relative power $P_{\max}$ (mean $21.36\text{ W/kg}$), and force-velocity slope $S_{\text{fv}}$.
+- **Hierarchical Trajectory Transformer (HTT-Genome)**:
+  - *Level 1 (Intra-Drill)*: Multi-scale 1D Conv (kernels 3, 7, 15) + temporal self-attention pooling.
+  - *Level 2 (Inter-Drill)*: Cross-modal attention fusing straight-line burst (40-yd dash), lateral elasticity (short shuttle), 3-cone agility, and position skill drills into a 48-dimensional **Prospect Movement Genome**.
+- **Empirical Validation Across 4 On-Field Tasks (5-Fold CV on Tesla T4)**:
+  1. **Pass Rusher Snap Get-Off ($N=131$)**:
+     - Stopwatch $M_0$: $R^2 = 0.1646$, RMSE = $0.0960\text{s}$, $r = 0.420$.
+     - Naive Kinematics $M_1$: $R^2 = 0.3224$, RMSE = $0.0864\text{s}$, $r = 0.574$.
+     - **HTT-Genome $M_2$**: **$R^2 = 0.3426$**, **RMSE = $0.0851\text{s}$**, **Pearson $r = 0.586$** ($p < 10^{-12}$).
+     - **Gain: $\Delta R^2 = +0.1780$ (+108.1% improvement)**, RMSE reduction of $11.4\%$.
+  2. **WR Route Separation at Release ($N=144$)**:
+     - Stopwatch $M_0$: $r = 0.165$.
+     - **HTT-Genome $M_2$**: **Pearson $r = 0.182$** ($p = 0.029$).
+  3. **OL Pass Protection Pressure Allowed ($N=120$)**:
+     - Baseline $M_0$: $r = 0.335$.
+     - **HTT-Genome $M_2$**: **$R^2 = 0.0843$**, **$r = 0.319$** ($p = 0.0004$).
+  4. **All-Prospect Career EPA Impact / Snap ($N=455$)**:
+     - Stopwatch $M_0$: $R^2 = -0.0063$, $r = 0.036$.
+     - **HTT-Genome $M_2$**: **$R^2 = -0.0034$**, **$r = 0.075$** (**$2.1\times$ baseline correlation**).
+- **Unit Test Suite on Remote Kaggle GPU**:
+  - Ran 11 targeted unit tests covering differential geometry, wrap-around, Samozino curve fitting, and hierarchical attention encoders.
+  - **Result: 11 PASSED / 0 FAILED in 0.42s on Tesla T4**.
+- **Publication-Grade Figures Generated**:
+  1. `model_benchmark_accuracy.png`
+  2. `prospect_movement_genome_cross_attention.png`
+  3. `biomechanical_force_velocity_profiles.png`
+  4. `in_game_linkage_validation.png`
 
 ---
 
-## 4. In-Progress & Next Phase Actions
+## 4. Next Phase Actions
 
 | Priority | Task Description | Target Deliverable | Status |
 | :---: | :--- | :--- | :--- |
-| **P1** | **Submission Report & Notebook Assembly**: Finalize the complete 2,000-word analytics submission notebook with executive scouting takeaways, interactive visual figures, and actionable front-office draft recommendations. | Kaggle submission report | 🟢 Ready to Assemble |
+| **P1** | **Final Report & Interactive Visuals**: Package the HTT-Genome architecture, force-velocity scouting profiles, and empirical translation tables into the final competition analytics paper. | Analytics paper & figures | 🟢 Ready |

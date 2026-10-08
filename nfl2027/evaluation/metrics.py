@@ -103,8 +103,11 @@ def run_benchmark_suite(
         for m_key in ["M0", "M1", "M2"]:
             if m_key in model_dict:
                 cols, model = model_dict[m_key]
-                # Impute missing values with median
-                X = df_task[cols].fillna(df_task[cols].median()).values
+                valid_cols = [c for c in cols if c in df_task.columns]
+                if not valid_cols:
+                    continue
+                # Impute missing values with column median, fallback to 0.0
+                X = df_task[valid_cols].fillna(df_task[valid_cols].median()).fillna(0.0).values
                 eval_out = evaluate_pipeline(X, y, model, cv=kf)
                 eval_records[m_key] = eval_out
                 task_res[f"{m_key}_R2"] = eval_out["r2"]

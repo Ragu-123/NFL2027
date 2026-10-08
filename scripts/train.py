@@ -45,6 +45,7 @@ from nfl2027.visualization.plots import (
     plot_hardware_acceleration,
     plot_phase_portraits_and_attention,
     plot_linkage_validation,
+    plot_draft_surplus_curve,
 )
 
 
@@ -133,9 +134,10 @@ def main():
     ).to(device)
 
     if forty_seq_indices:
-        forty_x = traj_tensor[forty_seq_indices, :, :100]
+        T_eval = min(100, traj_tensor.shape[2])
+        forty_x = traj_tensor[forty_seq_indices, :, :T_eval]
         forty_lens = lens_t[forty_seq_indices]
-        pad_mask = torch.arange(100, device=device).unsqueeze(0) >= forty_lens.unsqueeze(1)
+        pad_mask = torch.arange(T_eval, device=device).unsqueeze(0) >= forty_lens.unsqueeze(1)
         encoder.eval()
         with torch.no_grad():
             forty_emb, forty_alpha = encoder(forty_x, mask=pad_mask)
@@ -145,7 +147,7 @@ def main():
         df_forty_emb["nfl_id"] = forty_players
     else:
         df_forty_emb = None
-        forty_alpha_np = np.ones((1, 100)) / 100.0
+        forty_alpha_np = np.ones((1, min(100, traj_tensor.shape[2]))) / float(min(100, traj_tensor.shape[2]))
 
     # Extract scalar invariants and construct master feature matrix
     df_feat = extract_kinematic_invariants(
@@ -245,6 +247,15 @@ def main():
         fig4_path = os.path.join(cfg.output_dir, "in_game_linkage_validation.png")
         plot_linkage_validation(benchmark_results, save_path=fig4_path)
         print(f"  Saved Figure 4: {fig4_path}")
+
+        if "draft_overall_pick" in df_meta.columns and "total_career_snaps" in df_meta.columns:
+            valid_mask = df_meta["draft_overall_pick"].notna() & df_meta["total_career_snaps"].notna()
+            picks = df_meta.loc[valid_mask, "draft_overall_pick"].values
+            snaps = df_meta.loc[valid_mask, "total_career_snaps"].values
+            if len(picks) > 5:
+                fig5_path = os.path.join(cfg.output_dir, "draft_surplus_valuation_model.png")
+                plot_draft_surplus_curve(picks, snaps, save_path=fig5_path)
+                print(f"  Saved Figure 5: {fig5_path}")
 
     print("\n" + "=" * 80)
     print("PIPELINE COMPLETED SUCCESSFULLY!")

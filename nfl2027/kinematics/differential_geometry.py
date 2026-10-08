@@ -21,6 +21,7 @@ def compute_differential_geometry_cpu(
     direction: np.ndarray,
     dt: float = 0.1,
     eps: float = 0.01,
+    seq_lens: Optional[np.ndarray] = None,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Compute continuous Frenet-Serret kinematic derivatives using vectorized NumPy.
 
@@ -70,6 +71,19 @@ def compute_differential_geometry_cpu(
     # 6. Centripetal Kinetic Flux: Flux = a_n * s
     flux = an * speed
 
+    # Zero out padded elements beyond seq_lens
+    if seq_lens is not None:
+        lens_arr = np.asarray(seq_lens)
+        if lens_arr.ndim == 0:
+            lens_arr = np.array([lens_arr])
+        t_idx = np.arange(speed.shape[1])[np.newaxis, :]
+        pad_mask = t_idx >= lens_arr[:, np.newaxis]
+        jerk[pad_mask] = 0.0
+        curv[pad_mask] = 0.0
+        an[pad_mask] = 0.0
+        power[pad_mask] = 0.0
+        flux[pad_mask] = 0.0
+
     if is_1d:
         return jerk[0], curv[0], an[0], power[0], flux[0]
     return jerk, curv, an, power, flux
@@ -81,6 +95,7 @@ def compute_differential_geometry_torch(
     direction: torch.Tensor,
     dt: float = 0.1,
     eps: float = 0.01,
+    seq_lens: Optional[torch.Tensor] = None,
 ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
     """Compute continuous Frenet-Serret derivatives using PyTorch tensors.
 
@@ -92,6 +107,7 @@ def compute_differential_geometry_torch(
         direction: Motion heading tensor in degrees
         dt: Sampling delta time in seconds
         eps: Epsilon regularizer for curvature
+        seq_lens: Optional sequence lengths tensor to mask padded elements to 0.0
 
     Returns:
         Tuple of (jerk, curvature, normal_accel, power, flux) as torch.Tensors.
@@ -118,6 +134,18 @@ def compute_differential_geometry_torch(
 
     # 6. Centripetal Kinetic Flux
     flux = an * speed
+
+    # Zero out padded elements beyond seq_lens
+    if seq_lens is not None:
+        T = speed.shape[-1]
+        t_idx = torch.arange(T, device=speed.device)
+        if seq_lens.ndim == 1 and speed.ndim >= 2:
+            pad_mask = t_idx.unsqueeze(0) >= seq_lens.unsqueeze(1)
+            jerk = jerk.masked_fill(pad_mask, 0.0)
+            curv = curv.masked_fill(pad_mask, 0.0)
+            an = an.masked_fill(pad_mask, 0.0)
+            power = power.masked_fill(pad_mask, 0.0)
+            flux = flux.masked_fill(pad_mask, 0.0)
 
     return jerk, curv, an, power, flux
 

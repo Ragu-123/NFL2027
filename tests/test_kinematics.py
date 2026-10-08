@@ -115,3 +115,40 @@ def test_fused_differential_geometry_fallback():
     assert power.shape == (N, T)
     # Specific mechanical power = 5.0 * 2.0 = 10.0
     np.testing.assert_allclose(power.numpy(), 10.0, atol=1e-5)
+
+
+def test_samozino_fv_profiling():
+    """Verify that Samozino curve fitting accurately recovers v0, tau, and force."""
+    from nfl2027.kinematics.samozino import fit_samozino_fv_profile, exponential_velocity
+
+    dt = 0.1
+    t = np.arange(40) * dt
+    true_v0 = 10.5  # yd/s
+    true_tau = 1.2   # s
+    s_curve = exponential_velocity(t, true_v0, true_tau)
+
+    prof = fit_samozino_fv_profile(s_curve, dt=dt, weight_lbs=200.0)
+
+    # Theoretical maximum velocity should be close to true_v0
+    assert abs(prof['fv_v0'] - true_v0) < 0.2
+    # Tau should be close to true_tau
+    assert abs(prof['fv_tau'] - true_tau) < 0.2
+    # Pmax and F0 should be strictly positive
+    assert prof['fv_f0_rel'] > 0
+    assert prof['fv_pmax_rel'] > 0
+    assert prof['fv_slope'] < 0
+
+
+def test_samozino_jump_estimation():
+    """Verify that estimate_samozino_from_jump produces physically plausible values."""
+    from nfl2027.kinematics.samozino import estimate_samozino_from_jump
+
+    prof = estimate_samozino_from_jump(vertical_inches=36.0, broad_jump_inches=125.0, weight_lbs=240.0)
+
+    assert 9.0 <= prof['fv_v0'] <= 13.0
+    assert 0.8 <= prof['fv_tau'] <= 2.0
+    assert prof['fv_f0_rel'] > 5.0
+    assert prof['fv_pmax_rel'] > 15.0
+    assert prof['fv_F0_total'] > 500.0  # Total force in Newtons
+    assert prof['fv_Pmax_total'] > 1500.0  # Total power in Watts
+

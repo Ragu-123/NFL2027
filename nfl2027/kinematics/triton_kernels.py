@@ -147,11 +147,11 @@ def fused_differential_geometry(
     can_use_triton = prefer_triton and HAS_TRITON and HAS_CUDA and (s_t.device.type == "cuda")
 
     if can_use_triton:
-        out_jerk = torch.empty_like(s_t)
-        out_curv = torch.empty_like(s_t)
-        out_an = torch.empty_like(s_t)
-        out_power = torch.empty_like(s_t)
-        out_flux = torch.empty_like(s_t)
+        out_jerk = torch.zeros_like(s_t)
+        out_curv = torch.zeros_like(s_t)
+        out_an = torch.zeros_like(s_t)
+        out_power = torch.zeros_like(s_t)
+        out_flux = torch.zeros_like(s_t)
 
         grid = (num_seqs,)
         fused_trajectory_differential_geometry_kernel[grid](
@@ -170,8 +170,8 @@ def fused_differential_geometry(
         )
         return out_jerk, out_curv, out_an, out_power, out_flux
 
-    # Fallback to PyTorch vectorized computation
-    return compute_differential_geometry_torch(s_t, a_t, d_t, dt=dt, eps=0.01)
+    # Fallback to PyTorch vectorized computation with exact padding masking
+    return compute_differential_geometry_torch(s_t, a_t, d_t, dt=dt, eps=0.01, seq_lens=lens_t)
 
 
 def benchmark_kernel(
